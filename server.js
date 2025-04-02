@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 dotenv.config();
 
 // Define routes
-app.use("/auth", authRoutes);
+app.use("/", authRoutes);
 
 //conect to database
 connectDB();
