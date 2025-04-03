@@ -4,6 +4,7 @@ import {
   register,
   sendOtp,
   verifyOtp,
+  updatePassword,
 } from "../controllers/authController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 
@@ -14,5 +15,6 @@ router.post("/auth/signup", register);
 
 router.post("/forgotpassword/sendotp", sendOtp);
 router.post("/forgotpassword/otpverification", verifyOtp);
+router.post("/forgotpassword/updatepassword", updatePassword);
 
 export default router;

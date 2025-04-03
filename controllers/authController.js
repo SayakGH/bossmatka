@@ -104,6 +104,7 @@ const verifyOtp = async (req, res) => {
 
     user.otp = null;
     user.expireOtp = null;
+    user.verified = true;
     await user.save();
 
     res.status(200).json({ message: "OTP verified successfully" });
@@ -114,4 +115,34 @@ const verifyOtp = async (req, res) => {
   }
 };
 
-export { login, register, sendOtp, verifyOtp };
+//update password
+const updatePassword = async (req, res) => {
+  const { phone, newPassword } = req.body;
+  const user = await User.findOne({ phone: phone });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  if (!user.verified) {
+    return res.status(400).json({ message: "User not verified" });
+  }
+  if (!newPassword) {
+    return res.status(400).json({ message: "New password is required" });
+  }
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+  user.passwordHash = hashedPassword;
+  user.verified = false;
+  try {
+    await user.save();
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Full error:", error);
+    res.status(500).json({
+      message: "Error registering user",
+      error: error.message,
+      name: error.name,
+    });
+  }
+};
+
+export { login, register, sendOtp, verifyOtp, updatePassword };
