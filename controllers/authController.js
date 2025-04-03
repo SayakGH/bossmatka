@@ -113,5 +113,74 @@ const verifyOtp = async (req, res) => {
       .json({ message: "Error verifying OTP", error: error.message });
   }
 };
+// set new password 
+const changeaPassword = async (req, res) => {
+  // Add request body logging
+  console.log('Request body:', req.body);
 
-export { login, register, sendOtp, verifyOtp };
+  
+  
+
+  const { phone, newPassword } = req.body;
+
+  
+
+  
+  
+
+  try {
+    // Find user
+    const user = await User.findOne({ phone: phone });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword.toString(), salt);
+
+    // Update password and save
+    user.passwordHash = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error('Password change error:', error);
+    res.status(500).json({ 
+      message: "Error changing password",
+      error: error.message 
+    });
+  }
+};
+// logout user
+const logout = async (req, res) => {
+  const { phone } = req.body;
+  try {
+    const user = await User.findOne({ phone: phone });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.token = null;
+    await user.save();
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging out" });
+  }
+};
+// user CAN recieve notifactions
+const receiveNotifications = async (req, res) => {
+  const { phone } = req.body;
+  try {
+    const user = await User.findOne({ phone: phone });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.receiveNotifications = true;
+    await user.save();
+    res.status(200).json({ message: "Notifications enabled successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error enabling notifications" });
+  }
+}
+
+export { login, register, sendOtp, verifyOtp, changeaPassword ,logout, receiveNotifications };
