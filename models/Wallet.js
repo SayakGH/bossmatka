@@ -1,9 +1,22 @@
-import mongoose from "mongoose";
+import { DataTypes } from "sequelize";
+import sequelize from "../config/db.js"; // Import Sequelize connection instance
 
-const walletSchema = new mongoose.Schema({
-  phone: { type: Number, required: true, unique: true },
-  balance: { type: Number, default: 0 },
-});
+const Wallet = sequelize.define(
+  "Wallet",
+  {
+    phone: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      unique: true,
+    },
+    balance: {
+      type: DataTypes.BIGINT, // Use DECIMAL for more precise values
+      defaultValue: 0,
+    },
+  },
+  {
+    timestamps: true, // Adds createdAt & updatedAt fields
+  }
+);
 
-const Wallet = mongoose.model("Wallet", walletSchema);
 export default Wallet;

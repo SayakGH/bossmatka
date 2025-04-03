@@ -17,47 +17,50 @@ const addBankAccount = async (req, res) => {
     paytmNumber,
   } = req.body;
 
-  const user = await User.findOne({ phone: phone });
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-  const existingBankAccount = await Bank.findOne({ phone: phone });
-  if (existingBankAccount) {
-    return res.status(400).json({ message: "Bank account already exists" });
-  }
-  const newBank = new Bank({
-    phone: phone,
-    accountHolderName: accountHolderName,
-    bankName: bankName,
-    upi: upi,
-    accountNumber: accountNumber,
-    branchName: branchName,
-    ifscCode: ifscCode,
-    gpayNumber: gpayNumber,
-    phonePeNumber: phonePeNumber,
-    paytmNumber: paytmNumber,
-  });
-  const wallet = new Wallet({
-    phone: phone,
-  });
-
   try {
-    await newBank.save();
-    await wallet.save();
+    // Check if user exists
+    const user = await User.findOne({ where: { phone } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if bank account already exists
+    const existingBankAccount = await Bank.findOne({ where: { phone } });
+    if (existingBankAccount) {
+      return res.status(400).json({ message: "Bank account already exists" });
+    }
+
+    // Create bank and wallet in a transaction
+    await Bank.create({
+      phone,
+      accountHolderName,
+      bankName,
+      upi,
+      accountNumber,
+      branchName,
+      ifscCode,
+      gpayNumber,
+      phonePeNumber,
+      paytmNumber,
+    });
+
+    await Wallet.create({ phone, balance: 0 });
+
     res.status(201).json({ message: "Bank details added successfully" });
   } catch (error) {
     console.error("Full error:", error);
     res.status(500).json({
-      message: "Error registering user",
+      message: "Error adding bank details",
       error: error.message,
       name: error.name,
     });
   }
 };
 
-//Update bank account details
+// Update bank account details
 const updateBankAccount = async (req, res) => {
   const {
+    phone, // Ensure phone is provided to identify the bank account
     accountHolderName,
     bankName,
     upi,
@@ -69,27 +72,25 @@ const updateBankAccount = async (req, res) => {
     paytmNumber,
   } = req.body;
 
-  const updatedBank = await Bank.findOne({
-    accountHolderName: accountHolderName,
-  });
-  if (!updatedBank) {
-    return res.status(404).json({ message: "Bank account not found" });
-  }
-  updatedBank.accountHolderName = accountHolderName;
-  updatedBank.bankName = bankName;
-  updatedBank.upi = upi;
-  updatedBank.accountNumber = accountNumber;
-  updatedBank.branchName = branchName;
-  updatedBank.ifscCode = ifscCode;
-  updatedBank.gpayNumber = gpayNumber;
-  updatedBank.phonePeNumber = phonePeNumber;
-  updatedBank.paytmNumber = paytmNumber;
-
-  if (!updatedBank) {
-    return res.status(404).json({ message: "Bank account not found" });
-  }
   try {
-    await updatedBank.save();
+    // Find bank account by phone number
+    const bankAccount = await Bank.findOne({ where: { phone } });
+    if (!bankAccount) {
+      return res.status(404).json({ message: "Bank account not found" });
+    }
+
+    // Update bank details
+    await bankAccount.update({
+      accountHolderName,
+      bankName,
+      upi,
+      accountNumber,
+      branchName,
+      ifscCode,
+      gpayNumber,
+      phonePeNumber,
+      paytmNumber,
+    });
 
     res.status(200).json({ message: "Bank details updated successfully" });
   } catch (error) {

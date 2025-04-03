@@ -9,7 +9,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/user/addbank", addBankAccount);
-router.post("/user/updatebank", updateBankAccount);
+router.post("/addbank", addBankAccount);
+router.post("/updatebank", updateBankAccount);
 
 export default router;

@@ -1,17 +1,55 @@
-import mongoose from "mongoose";
+import { DataTypes } from "sequelize";
+import sequelize from "../config/db.js"; // Import Sequelize connection instance
 
-const bankSchema = new mongoose.Schema({
-  phone: { type: Number, required: true, unique: true },
-  accountHolderName: { type: String, required: true },
-  bankName: { type: String, required: true },
-  upi: { type: String, required: true },
-  accountNumber: { type: String, required: true },
-  branchName: { type: String, required: true },
-  ifscCode: { type: String, required: true },
-  gpayNumber: { type: Number, required: true },
-  phonePeNumber: { type: Number, required: true },
-  paytmNumber: { type: Number, required: true },
-});
+const Bank = sequelize.define(
+  "Bank",
+  {
+    phone: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      unique: true,
+      // validate: { isNumeric: true },
+    },
+    accountHolderName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    bankName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    upi: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    accountNumber: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    branchName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    ifscCode: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    gpayNumber: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+    },
+    phonePeNumber: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+    },
+    paytmNumber: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+    },
+  },
+  {
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
+  }
+);
 
-const Bank = mongoose.model("Bank", bankSchema);
 export default Bank;

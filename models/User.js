@@ -1,16 +1,44 @@
-import mongoose from "mongoose";
+import { DataTypes } from "sequelize";
+import sequelize from "../config/db.js"; // Import Sequelize connection instance
 
-const UserSchema = new mongoose.Schema(
+const User = sequelize.define(
+  "User",
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    phone: { type: Number, required: true, unique: true },
-    passwordHash: { type: String, required: true },
-    otp: { type: Number, default: null },
-    expireOtp: { type: Date, default: Date.now() },
-    verified: { type: Boolean, default: false },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      // validate: { isEmail: true },
+    },
+    phone: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+      unique: true,
+    },
+    passwordHash: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    otp: {
+      type: DataTypes.INTEGER,
+      defaultValue: null,
+    },
+    expireOtp: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
-  { timeSramp: true }
+  {
+    timestamps: true, // Automatically adds createdAt & updatedAt fields
+  }
 );
 
-export default mongoose.model("User", UserSchema);
+export default User;
