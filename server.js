@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import sequelize from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import bankRoutes from "./routes/bankRoutes.js";
+import walletRoutes from "./routes/walletRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,6 +18,7 @@ dotenv.config();
 // Define routes
 app.use("/", authRoutes);
 app.use("/user", bankRoutes);
+app.use("/user", walletRoutes);
 
 //conect to database
 sequelize
